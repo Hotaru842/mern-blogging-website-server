@@ -1,8 +1,7 @@
-POST http://localhost:3000/sign-up
+POST http://localhost:3000/sign-in
 Content-Type: application/json 
 
 {
-    "fullname": "Maria Benitez",
-    "email": "shiningforce972@gmail.com",
-    "password": "2E71.Sega"
+    "email": "unicorndad8@gmail.com",
+    "password": "BlueUnicorn.8"
 }
