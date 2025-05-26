@@ -1,8 +1,8 @@
 POST http://localhost:3000/sign-up
-Content-Type: application/json
+Content-Type: application/json 
 
 {
-    "fullname": "Unicorn Dad",
-    "email": "unicorndad8@gmail.com",
-    "password": "BlueUnicorn.8"
+    "fullname": "Maria Benitez",
+    "email": "shiningforce972@gmail.com",
+    "password": "2E71.Sega"
 }
