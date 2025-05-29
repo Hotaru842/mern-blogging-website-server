@@ -106,6 +106,7 @@ server.post("/sign-in", (req, res) => {
     if(!user) {
       return res.status(403).json({ "error": "Email not found" });
     }
+<<<<<<< HEAD
 
     if(!user.google_auth) {
       bcrypt.compare(password, user.personal_info.password, (err, result) => {
@@ -122,10 +123,25 @@ server.post("/sign-in", (req, res) => {
     } else {
       return res.status(403).json({ "error": "Account was created using Google. Try logging in with Google" })
     }
+=======
+    
+    bcrypt.compare(password, user.personal_info.password, (err, result) => {
+      if(err) {
+        return res.status(403).json({ "error": "Error ocurred while login, please try again" })
+      }
+
+      if(!result) {
+        return res.status(403).json({ "error": "Incorrect password" })
+      } else {
+        return res.status(200).json(formatDataToSend(user));
+      }
+    });
+>>>>>>> d9dce6e190d65261dc314fe8ce80968b10d2df81
   }).catch((err) => {
     console.log(err.message);
     return res.status(500).json({ "error": err.message });
   });
+<<<<<<< HEAD
 });
 
 server.post("/google-auth", async (req, res) => {
@@ -171,6 +187,9 @@ server.post("/google-auth", async (req, res) => {
     return res.status(500).json({ "error": "Fail to authenticate with Google. Try with another Google account" })
   })
 });
+=======
+})
+>>>>>>> d9dce6e190d65261dc314fe8ce80968b10d2df81
 
 server.listen(PORT, () => {
   console.log("listening on port => " + PORT);
