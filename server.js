@@ -36,6 +36,18 @@ const s3 = new aws.S3({
   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
 });
 
+const generateUploadURL = async () => {
+  const date = new Date();
+  const imageName = `${nanoid()}-${date.getTime()}.jpeg`;
+
+  return await s3.getSignedUrlPromise("putObject", {
+    Bucket: "ceci-blog-website",
+    Key: imageName,
+    Expires: 1000,
+    ContentType: "image/jpeg",
+  });
+}
+
 const formatDataToSend = (user) => {
   const access_token = jwt.sign({ id: user._id }, process.env.SECRET_ACCESS_KEY);
 
@@ -57,6 +69,15 @@ const generateUsername = async (email) => {
 
   return username; 
 }
+
+// upload image URL route
+server.get("/get-upload-url", (req, res) => {
+  generateUploadURL().then(url => res.status(200).json({ uploadURL: url}))
+  .catch((err) => {
+    console.log(err.message);
+    return res.status(500).json({ "error": err.message });
+  })
+});
 
 server.post("/sign-up", (req, res) => {
   let { fullname, email, password } = req.body;
@@ -106,7 +127,6 @@ server.post("/sign-in", (req, res) => {
     if(!user) {
       return res.status(403).json({ "error": "Email not found" });
     }
-<<<<<<< HEAD
 
     if(!user.google_auth) {
       bcrypt.compare(password, user.personal_info.password, (err, result) => {
@@ -123,7 +143,6 @@ server.post("/sign-in", (req, res) => {
     } else {
       return res.status(403).json({ "error": "Account was created using Google. Try logging in with Google" })
     }
-=======
     
     bcrypt.compare(password, user.personal_info.password, (err, result) => {
       if(err) {
@@ -136,12 +155,10 @@ server.post("/sign-in", (req, res) => {
         return res.status(200).json(formatDataToSend(user));
       }
     });
->>>>>>> d9dce6e190d65261dc314fe8ce80968b10d2df81
   }).catch((err) => {
     console.log(err.message);
     return res.status(500).json({ "error": err.message });
   });
-<<<<<<< HEAD
 });
 
 server.post("/google-auth", async (req, res) => {
@@ -187,9 +204,6 @@ server.post("/google-auth", async (req, res) => {
     return res.status(500).json({ "error": "Fail to authenticate with Google. Try with another Google account" })
   })
 });
-=======
-})
->>>>>>> d9dce6e190d65261dc314fe8ce80968b10d2df81
 
 server.listen(PORT, () => {
   console.log("listening on port => " + PORT);
