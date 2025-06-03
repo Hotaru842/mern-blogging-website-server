@@ -1,1 +1,7 @@
-GET http://localhost:3000/get-upload-url
+POST http://localhost:3000/create-blog
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4MzUyZmUzZjhiMjlkNjNkNjdkMmM3OCIsImlhdCI6MTc0ODg5MzUxM30.dElLak33mYXFwq76YlmCIIfYAs9bjEoatrPGktU9nIQ
+
+{
+  "title": "test title"
+}
