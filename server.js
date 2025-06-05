@@ -224,31 +224,48 @@ server.post("/google-auth", async (req, res) => {
   })
 });
 
+server.get("/latest-blogs", (req, res) => {
+  let maxLimit = 5;
+
+  Blog.find({ draft: false }).populate("author", "personal_info.profile_img personal_info.username personal_info.fullname -_id")
+  .sort({ "publishedAt": -1 })
+  .select("blog_id title desc banner activity tags publishedAt -_id")
+  .limit(maxLimit)
+  .then(blogs => {
+    return res.status(200).json({ blogs });
+  })
+  .catch(err => {
+    return res.status(500).json({ error: err.message });
+  })
+})
+
 server.post("/create-blog", verifyJWT, (req, res) => {
   let authorId = req.user;
 
   let { title, banner, desc, tags, content, draft } = req.body;
 
   if(!title.length) {
-    return res.status(403).json({ error: "You must provide a title to publish the blog post"})
+    return res.status(403).json({ error: "You must provide a title"})
   }
 
-  if(!desc.length || desc.length > 200) {
-    return res.status(403).json({ error: "You must provide a blog description under 200 characters"})
+  if(!draft) {
+    if(!desc.length || desc.length > 200) {
+      return res.status(403).json({ error: "You must provide a blog description under 200 characters"})
+    }
+  
+    if(!banner.length) {
+      return res.status(403).json({ error: "You must provide blog banner to publish it" })
+    }
+  
+    if(!content.blocks.length) {
+      return res.status(403).json({ error: "There must be some blog content to publish it" })
+    }
+  
+    if(!tags.length || tags.length > 10) {
+      return res.status(403).json({ error: "Provide tags to publish it, max 10 tags" })
+    }  
   }
-
-  if(!banner.length) {
-    return res.status(403).json({ error: "You must provide blog banner to publish it" })
-  }
-
-  if(!content.blocks.length) {
-    return res.status(403).json({ error: "There must be some blog content to publish it" })
-  }
-
-  if(!tags.length || tags.length > 10) {
-    return res.status(403).json({ error: "Provide tags to publish it, max 10 tags" })
-  }
-
+  
   tags = tags.map((tag) => tag.toLowerCase());
   let blog_id = title.replace(/[^a-zA-Z0-9]/g, " ").replace(/\s+/g, "-").trim() + nanoid();
   
