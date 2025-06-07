@@ -142,40 +142,29 @@ server.post("/sign-in", (req, res) => {
   User.findOne({ "personal_info.email": email })
   .then((user) => {
     if(!user) {
-      return res.status(403).json({ error: "Email not found" });
+      return res.status(403).json({ error: "Email not found" })
     }
 
     if(!user.google_auth) {
       bcrypt.compare(password, user.personal_info.password, (err, result) => {
         if(err) {
-          return res.status(403).json({ error: "Error ocurred while login, please try again" })
+          return res.status(403).json({ error: "Error ocurred while login, please try again"})
         }
   
         if(!result) {
-          return res.status(403).json({ error: "Incorrect password" })
+          return res.status(403).json({ error: "Incorrect password" });
         } else {
           return res.status(200).json(formatDataToSend(user));
         }
-      });
+      })
     } else {
-      return res.status(403).json({ error: "Account was created using Google. Try logging in with Google" })
-    }
-    
-    bcrypt.compare(password, user.personal_info.password, (err, result) => {
-      if(err) {
-        return res.status(403).json({ error: "Error ocurred while login, please try again" })
-      }
-
-      if(!result) {
-        return res.status(403).json({ error: "Incorrect password" })
-      } else {
-        return res.status(200).json(formatDataToSend(user));
-      }
-    });
-  }).catch((err) => {
+      return res.status(403).json({ error: "Account was created using Google, try logging in with Google" });
+    } 
+  })
+  .catch(err => {
     console.log(err.message);
-    return res.status(500).json({ error: err.message });
-  });
+    return res.status(500).json({ error: err.message })
+  })
 });
 
 server.post("/google-auth", async (req, res) => {

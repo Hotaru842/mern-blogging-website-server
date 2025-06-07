@@ -1,6 +1,7 @@
-POST http://localhost:3000/search-blogs
+POST http://localhost:3000/sign-in
 Content-Type: application/json
 
 {
-  "tag": "sweet"
+  "email": "unicornda@gmail.com",
+  "password": "BlueUnicorn" 
 }
