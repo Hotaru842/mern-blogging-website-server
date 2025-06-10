@@ -1,7 +1,6 @@
-POST http://localhost:3000/sign-in
+POST http://localhost:3000/search-users
 Content-Type: application/json
 
 {
-  "email": "unicornda@gmail.com",
-  "password": "BlueUnicorn" 
+  "query": "Uni"
 }
