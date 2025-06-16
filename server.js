@@ -12,6 +12,7 @@ import aws from "aws-sdk";
 
 import User from "./Schema/User.js";
 import Blog from "./Schema/Blog.js";
+import Notification from "./Schema/Notification.js";
 
 const server = express();
 let PORT = 3000;
@@ -330,7 +331,7 @@ server.post("/get-profile", (req, res) => {
   })
 })
 
-server.post("/create-blog", verifyJWT, (req, res) => {
+server.post("/create-blog", verifyJWT, (req, res) => { 
   let authorId = req.user;
 
   let { title, banner, desc, tags, content, draft, id } = req.body;
@@ -397,7 +398,7 @@ server.post("/create-blog", verifyJWT, (req, res) => {
 
 server.post("/get-blog", (req, res) => {
   let { blog_id, draft, mode } = req.body;
-  let incrementVal = mode !== "edit" ? 1 : 0;
+  let incrementVal = mode !== "edit" ? 1 : 0; 
 
   Blog.findOneAndUpdate({ blog_id }, { $inc: { "activity.total_reads": incrementVal }})
   .populate("author", "personal_info.fullname personal_info.username personal_info.profile_img")
@@ -418,6 +419,30 @@ server.post("/get-blog", (req, res) => {
   })
   .catch(err => {
     return res.status(500).json({ error: err.message });
+  })
+}); 
+
+server.post("/like-blog", verifyJWT, (req, res) => {
+  let user_id = req.user;
+
+  let { _id, isLikedByUser } = req.body;
+
+  let incrementVal = !isLikedByUser ? 1 : isLikedByUser > 0 ? -1 : 0;
+
+  Blog.findOneAndUpdate({ _id }, { $inc: { "activity.total_likes": incrementVal }})
+  .then(blog => {
+    if(!isLikedByUser) {
+      let like = new Notification({
+        type: "like",
+        blog: _id,
+        notification_for: blog.author,
+        user: user_id,
+      });
+
+      like.save().then(notification => {
+        return res.status(200).json({ liked_by_user: true })
+      })
+    }
   })
 });
 
