@@ -486,6 +486,7 @@ server.post("/add-comment", verifyJWT, (req, res) => {
 
   if(replying_to) {
     commentObj.parent = replying_to;
+    commentObj.isReply = true; 
   }
 
   new Comment(commentObj).save().then(async commentFile => {
@@ -571,7 +572,7 @@ server.post("/get-replies", (req, res) => {
   .catch(err => {
     return res.status(500).json({ error: err.message });
   })
-});
+}); 
 
 server.listen(PORT, () => {
   console.log("listening on port => " + PORT);
