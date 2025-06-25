@@ -213,6 +213,45 @@ server.post("/google-auth", async (req, res) => {
   })
 });
 
+server.post("/change-password", verifyJWT, (req, res) => {
+  let { currentPassword, newPassword } = req.body;
+
+  if(!passwordRegex.test(currentPassword) || !passwordRegex.test(newPassword)) {
+    return res.status(403).json({ error: "Password should be 6 to 20 characters long, with a numeric, 1 lowercase, 1 uppercase letters" })
+  }
+
+  User.findOne({ _id: req.user })
+  .then((user) => {
+    if(user.google_auth) {
+      return res.status(403).json({ error: "You can't change account's password because you logged in through Google" })
+    }
+
+    bcrypt.compare(currentPassword, user.personal_info.password, (err, result) => {
+      if(err) {
+        return res.status(500).json({ error: "Some error ocurred while changing the password, please try again later" })
+      } 
+
+      if(!result) {
+        return res.status(403).json({ error: "Incorrect current password" })
+      }
+
+      bcrypt.hash(newPassword, 10, (err, hashed_password) => {
+        User.findOneAndUpdate({ _id: req.user }, { "personal_info.password": hashed_password })
+        .then((u) => {
+          return res.status(200).json({ status: "Password changed" })
+        })
+        .catch(err => {
+          return res.status(500).json({ error: "Some error ocurred while saving new password, please try again later" })
+        })
+      })
+    })
+  })
+  .catch(err => {
+    console.log(err);
+    return res.status(500).json({ error: "User not found" })
+  })
+});
+
 server.post("/latest-blogs", (req, res) => {
   let { page } = req.body;
 
@@ -549,12 +588,12 @@ server.post("/get-blog-comments", (req, res) => {
 
 server.post("/get-replies", (req, res) => {
   let { _id, skip } = req.body;
-  let maxLimit = 5;
+  let maxLimit = 5; 
 
   Comment.findOne({ _id })
   .populate({
     path: "children",
-    option: {
+    options: {
       limit: maxLimit,
       skip: skip,
       sort: { "commentedAt": -1 }
@@ -602,7 +641,7 @@ const deleteComments = (_id) => {
   .catch(err => {
     console.log(err.message);
   })
-}
+} 
 
 server.post("/delete-comment", verifyJWT, (req, res) => {
   let user_id = req.user;
@@ -611,14 +650,14 @@ server.post("/delete-comment", verifyJWT, (req, res) => {
 
   Comment.findOne({ _id })
   .then(comment => {
-    if(user_id === comment.commented_by || user_id === comment.blog_author) {
+    if(user_id == comment.commented_by || user_id == comment.blog_author) {
       deleteComments(_id);
 
       return res.status(200).json({ status: "done" })
     } else {
       return res.status(403).json({ error: "Unauthorize. You can't delete this comment" })
     }
-  })
+  }) 
 });
 
 server.listen(PORT, () => {
