@@ -1,9 +1,4 @@
-POST http://localhost:3000/change-password
+GET http://localhost:3000/new-notification
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4MzUyZmUzZjhiMjlkNjNkNjdkMmM3OCIsImlhdCI6MTc1MDg0OTE0NX0.SGNFvPBlN0TZYCx9vVTMYXEXfbJSwBsT55X7XpXMtSU
-
-{
-  "currentPassword": "2E71.Sega",
-  "newPassword": "BlueUnicorn.8"
-}
 
