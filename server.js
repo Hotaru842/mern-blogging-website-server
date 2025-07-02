@@ -691,7 +691,7 @@ const deleteComments = (_id) => {
     Notification.findOneAndDelete({ comment: _id })
     .then(notification => console.log("Comment Notification deleted"));
 
-    Notification.findOneAndDelete({ reply: _id })
+    Notification.findOneAndUpdate({ reply: _id }, { $unset: { reply: 1 }})
     .then(notification => console.log("Reply Notification deleted"));
 
     Blog.findOneAndUpdate({ _id: comment.blog_id }, { $pull: { comments: _id }, 
