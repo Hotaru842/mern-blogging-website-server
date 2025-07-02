@@ -571,7 +571,7 @@ server.post("/is-liked-by-user", verifyJWT, (req, res) => {
 
 server.post("/add-comment", verifyJWT, (req, res) => {
   let user_id = req.user;
-  let { _id, comment, blog_author, replying_to } = req.body;
+  let { _id, comment, blog_author, replying_to, notification_id } = req.body;
 
   if(!comment?.length) {
     return res.status(403).json({ error: "You must write something to leave a comment"})
@@ -611,6 +611,11 @@ server.post("/add-comment", verifyJWT, (req, res) => {
 
       await Comment.findOneAndUpdate({ _id: replying_to }, { $push: { children: commentFile._id }})
       .then(replyingToCommentDoc => { notificationObj.notification_for = replyingToCommentDoc.commented_by })
+    
+      if(notification_id) {
+        Notification.findOneAndUpdate({ _id: notification_id }, { reply: commentFile._id })
+        .then(notification => console.log("notification updated"))
+      }
     }
 
     new Notification(notificationObj).save().then(notification => {
@@ -739,7 +744,7 @@ server.get("/new-notification", verifyJWT, (req, res) => {
 });
 
 server.post("/notifications", verifyJWT, (req, res) => {
-  let user_id = req.id;
+  let user_id = req.user; 
 
   let { page, filter, deletedDocCount } = req.body;
 
