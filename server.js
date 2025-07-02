@@ -773,6 +773,11 @@ server.post("/notifications", verifyJWT, (req, res) => {
   .sort({ createdAt: -1 })
   .select("createdAt type seen reply")
   .then(notifications => {
+    Notification.updateMany(findQuery, { seen: true })
+    .skip(skipDocs)
+    .limit(maxLimit)
+    .then(() => console.log("notification seen"))
+
     return res.status(200).json({ notifications });
   })
   .catch(err => {
@@ -799,6 +804,31 @@ server.post("/all-notifications-count", verifyJWT, (req, res) => {
   .catch(err => {
     return res.status(500).json({ error: err.message });
   })
+});
+
+server.post("/user-written-blogs", verifyJWT, (req, res) => {
+  let user_id = req.user;
+
+  let { page, draft, query, deletedDocCount } = req.body;
+
+  let maxLimit = 5;
+  let skipDocs = (page - 1) * maxLimit;
+
+  if(deletedDocCount) {
+    skipDocs -= deletedDocCount;
+  }
+
+  Blog.find({ author: user_id, draft, title: new RegExp(query, "i") })
+  .skip(skipDocs)
+  .limit(maxLimit)
+  .sort({ publishedAt: -1 })
+  .select("title banner publishedAt blog_id activity desc draft -_id")
+  .then(blogs => {
+    return res.status(200).json({ blogs });
+  })
+  .catch(err => {
+    return res.status(500).json({ error: err.message });
+  });
 });
 
 server.listen(PORT, () => {

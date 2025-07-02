@@ -1,4 +1,9 @@
-GET http://localhost:3000/new-notification
+POST http://localhost:3000/user-written-blogs
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4MzUyZmUzZjhiMjlkNjNkNjdkMmM3OCIsImlhdCI6MTc1MDg0OTE0NX0.SGNFvPBlN0TZYCx9vVTMYXEXfbJSwBsT55X7XpXMtSU
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4MzUyZmUzZjhiMjlkNjNkNjdkMmM3OCIsImlhdCI6MTc1MTQ4NTUyM30.9tFdimfKTBGpcFq7Pc03IJMn4pFD7ECGjQhyM3iWMPM
+
+{
+  "page": 1,
+  "draft": true
+}
 
